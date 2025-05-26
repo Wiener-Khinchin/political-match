@@ -92,7 +92,7 @@ export default function ResultPage() {
 
             <div className="w-full pt-6 border-t border-gray-200">
               <h3 className="text-lg font-semibold text-center mb-4">
-                친구에게 링크 공유하기
+                링크 공유하기
               </h3>
               <div className="flex justify-center gap-4">
                 {/* 기본(네이티브/클립보드) 공유 */}
