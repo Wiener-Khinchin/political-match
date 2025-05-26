@@ -39,31 +39,32 @@ export default function SurveyPage() {
   }, [currentStep, startIndex]);
 
   /* ---------------- answer handler ---------------- */
-  const handleAnswer = (idxInPage: number, value: number) => {
-    const globalIdx = idxInPage + startIndex;
-    const prev = userScores[globalIdx];
+  /* ---------------- answer handler ---------------- */
+const handleAnswer = (idxInPage: number, value: number) => {
+  const globalIdx = idxInPage + startIndex;
 
-    // 1) 점수 갱신
-    setAnswer(globalIdx, value);
+  /* 1) 점수 배열 갱신 */
+  const newScores = [
+    ...userScores.slice(0, globalIdx),
+    value,
+    ...userScores.slice(globalIdx + 1),
+  ];
+  setAnswer(globalIdx, value);
 
-    // 2) 처음 답한 문항일 때만 진도++
-    const pageFilled = userScores.slice(startIndex, endIndex).every(v => v !== 0);
-    if (pageFilled && endIndex < QUESTIONS.length) {
-      setCurrentStep(endIndex);
-    }
+  /* 2) 현재 페이지가 모두 채워졌는지 검사 → 채워졌다면 다음 페이지 첫 문항으로 */
+  const pageFilled = newScores.slice(startIndex, endIndex).every(v => v !== 0);
+  if (pageFilled && endIndex < QUESTIONS.length) {
+    setCurrentStep(endIndex);           // 다음 페이지 첫 문항
+  }
 
-    // 3) 모든 문항이 채워졌으면 결과 페이지로 이동
-    const newScores = [
-      ...userScores.slice(0, globalIdx),
-      value,
-      ...userScores.slice(globalIdx + 1),
-    ];
-    if (newScores.every((v) => v !== 0)) {
-      const { best, similarity } = findBestMatch(newScores, CANDIDATES);
-      setBestMatch({ id: best.id, similarity });
-      router.push("/result");
-    }
-  };
+  /* 3) 전체 설문 완료 시 결과 계산 후 이동 */
+  if (newScores.every(v => v !== 0)) {
+    const { best, similarity } = findBestMatch(newScores, CANDIDATES);
+    setBestMatch({ id: best.id, similarity });
+    router.push("/result");
+  }
+};
+
 
   /* ---------------- 이미 답한 문항 클릭 시 ---------------- */
   const handleQuestionClick = (globalIdx: number) => {
