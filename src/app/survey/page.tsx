@@ -39,32 +39,42 @@ export default function SurveyPage() {
   }, [currentStep, startIndex]);
 
   /* ---------------- answer handler ---------------- */
-  const handleAnswer = (idxInPage: number, value: number) => {
-    const globalIdx = idxInPage + startIndex;
-    const prev      = userScores[globalIdx];
+  /* ---------------- answer handler ---------------- */
+const handleAnswer = (idxInPage: number, value: number) => {
+  const globalIdx = idxInPage + startIndex;
+  const prev      = userScores[globalIdx];
 
-    const newScores = [
-      ...userScores.slice(0, globalIdx),
-      value,
-      ...userScores.slice(globalIdx + 1),
-    ];
-    setAnswer(globalIdx, value);
+  /* 1) 새 점수 배열 */
+  const newScores = [
+    ...userScores.slice(0, globalIdx),
+    value,
+    ...userScores.slice(globalIdx + 1),
+  ];
+  setAnswer(globalIdx, value);
 
-    // 다음 문항 or 다음 페이지
-    const pageFilled = newScores.slice(startIndex, endIndex).every(v => v !== 0);
-    if (pageFilled && endIndex < QUESTIONS.length) {
+  /* 2) 이번 문항을 처음 답했을 때만 커서 이동 로직 수행 */
+  if (prev === 0) {
+    const pageScores      = newScores.slice(startIndex, endIndex);     // 현재 페이지 6문항
+    const firstUnanswered = pageScores.findIndex(v => v === 0);        // 아직 안 푼 문항 인덱스
+
+    if (firstUnanswered !== -1) {
+      /* 아직 안 푼 문항이 남아 있으면 → 그 문항으로 이동 */
+      setCurrentStep(startIndex + firstUnanswered);
+    } else if (endIndex < QUESTIONS.length) {
+      /* 페이지가 전부 채워졌으면 → 다음 페이지 첫 문항으로 */
       setCurrentStep(endIndex);
-    } else if (prev === 0 && globalIdx + 1 < QUESTIONS.length) {
-      setCurrentStep(globalIdx + 1);
     }
+    /* (마지막 페이지까지 꽉 채운 경우는 아래 결과 이동 로직에서 처리) */
+  }
 
-    // 설문 완료 → 결과
-    if (newScores.every(v => v !== 0)) {
-      const { best, similarity } = findBestMatch(newScores, CANDIDATES);
-      setBestMatch({ id: best.id, similarity });
-      router.push("/result");
-    }
-  };
+  /* 3) 설문 전체 완료 시 결과 페이지로 이동 */
+  if (newScores.every(v => v !== 0)) {
+    const { best, similarity } = findBestMatch(newScores, CANDIDATES);
+    setBestMatch({ id: best.id, similarity });
+    router.push("/result");
+  }
+};
+
 
   /* ---------------- render ---------------- */
   return (
@@ -90,10 +100,7 @@ export default function SurveyPage() {
               `}
             >
               {/* 질문 텍스트 */}
-              <h2 className="text-xl font-semibold mb-4 text-center break-words leading-relaxed">
-  {number}. {question.text}
-</h2>
-
+              
 
               {/* ───────── Likert 스케일 ───────── */}
               <div className="relative w-full">
