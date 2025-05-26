@@ -24,9 +24,9 @@ export default function SurveyPage() {
   const router = useRouter();
 
   /* ---------------- pagination ---------------- */
-  const currentPage = currentStep >= 24 ? 4 : Math.floor(currentStep / 6);
-  const startIndex = currentPage === 0 ? 0 : currentPage * 6;
-  const endIndex = currentPage === 4 ? 31 : startIndex + 6;
+  const currentPage  = currentStep >= 24 ? 4 : Math.floor(currentStep / 6);
+  const startIndex   = currentPage === 0 ? 0 : currentPage * 6;
+  const endIndex     = currentPage === 4 ? 31 : startIndex + 6;
   const currentQuestions = QUESTIONS.slice(startIndex, endIndex);
 
   /* ---------------- scroll on step change ---------------- */
@@ -39,37 +39,28 @@ export default function SurveyPage() {
   }, [currentStep, startIndex]);
 
   /* ---------------- answer handler ---------------- */
-  /* ---------------- answer handler ---------------- */
-const handleAnswer = (idxInPage: number, value: number) => {
-  const globalIdx = idxInPage + startIndex;
+  const handleAnswer = (idxInPage: number, value: number) => {
+    const globalIdx = idxInPage + startIndex;
+    const prev      = userScores[globalIdx];
 
-  /* 1) 점수 배열 갱신 */
-  const newScores = [
-    ...userScores.slice(0, globalIdx),
-    value,
-    ...userScores.slice(globalIdx + 1),
-  ];
-  setAnswer(globalIdx, value);
+    const newScores = [
+      ...userScores.slice(0, globalIdx),
+      value,
+      ...userScores.slice(globalIdx + 1),
+    ];
+    setAnswer(globalIdx, value);
 
-  /* 2) 현재 페이지가 모두 채워졌는지 검사 → 채워졌다면 다음 페이지 첫 문항으로 */
-  const pageFilled = newScores.slice(startIndex, endIndex).every(v => v !== 0);
-  if (pageFilled && endIndex < QUESTIONS.length) {
-    setCurrentStep(endIndex);           // 다음 페이지 첫 문항
-  }
+    const pageFilled = newScores.slice(startIndex, endIndex).every(v => v !== 0);
+    if (pageFilled && endIndex < QUESTIONS.length) {
+      setCurrentStep(endIndex);                    // 페이지 완료 → 다음 페이지
+    } else if (prev === 0 && globalIdx + 1 < QUESTIONS.length) {
+      setCurrentStep(globalIdx + 1);               // 새 답변 → 다음 문항
+    }
 
-  /* 3) 전체 설문 완료 시 결과 계산 후 이동 */
-  if (newScores.every(v => v !== 0)) {
-    const { best, similarity } = findBestMatch(newScores, CANDIDATES);
-    setBestMatch({ id: best.id, similarity });
-    router.push("/result");
-  }
-};
-
-
-  /* ---------------- 이미 답한 문항 클릭 시 ---------------- */
-  const handleQuestionClick = (globalIdx: number) => {
-    if (userScores[globalIdx] !== 0) {
-      useSurveyStore.setState({ currentStep: globalIdx });
+    if (newScores.every(v => v !== 0)) {
+      const { best, similarity } = findBestMatch(newScores, CANDIDATES);
+      setBestMatch({ id: best.id, similarity });
+      router.push("/result");
     }
   };
 
@@ -78,25 +69,23 @@ const handleAnswer = (idxInPage: number, value: number) => {
     <div className="max-w-2xl mx-auto p-6">
       <div className="space-y-12">
         {currentQuestions.map((question, idxInPage) => {
-          const number = idxInPage + startIndex + 1;
-          const isActive = number - 1 === currentStep;
+          const number     = idxInPage + startIndex + 1;
+          const isActive   = number - 1 === currentStep;
           const isAnswered = userScores[number - 1] !== 0;
-          const hasArgs = question.cons !== "" || question.pros !== "";
+          const hasArgs    = question.cons !== "" || question.pros !== "";
 
           return (
             <div
               key={number}
-              ref={(el) => {
-                questionRefs.current[idxInPage] = el; // 안전한 ref 콜백
-              }}
-              onClick={() => handleQuestionClick(number - 1)}
-              className={`transition-all cursor-pointer ${
-                isActive
+              ref={(el) => { questionRefs.current[idxInPage] = el; }}
+              className={`
+                transition-all
+                ${isActive
                   ? "opacity-100 scale-100"
                   : isAnswered
-                  ? "opacity-60 scale-95 hover:opacity-80"
-                  : "opacity-40 scale-95"
-              }`}
+                  ? "opacity-60 scale-95"
+                  : "opacity-40 scale-95"}
+              `}
             >
               {/* 질문 텍스트 */}
               <h2 className="text-xl font-semibold mb-4 text-center">
@@ -133,12 +122,14 @@ const handleAnswer = (idxInPage: number, value: number) => {
                         : val === 1 || val === 5
                         ? "w-14 h-14 text-lg"
                         : "w-12 h-12 text-base";
+
                     const baseColor =
                       val <= 2
                         ? "border-red-500 hover:border-red-600"
                         : val >= 4
                         ? "border-green-500 hover:border-green-600"
                         : "border-gray-400 hover:border-gray-500";
+
                     const selColor =
                       val <= 2
                         ? "bg-red-500 border-red-500"
@@ -153,12 +144,13 @@ const handleAnswer = (idxInPage: number, value: number) => {
                             e.stopPropagation();
                             handleAnswer(idxInPage, val);
                           }}
-                          className={`${size} rounded-full border-2 flex items-center justify-center transition
+                          className={`
+                            ${size} rounded-full border-2 flex items-center justify-center transition
                             ${
                               userScores[number - 1] === val
                                 ? `${selColor} text-white`
-                                : `${baseColor} hover:scale-105`
-                            }`}
+                                : `${baseColor} hover:scale-105`}
+                          `}
                         >
                           {val}
                         </button>
@@ -169,13 +161,11 @@ const handleAnswer = (idxInPage: number, value: number) => {
 
                 {/* 하단 라벨 */}
                 <div className="grid grid-cols-5 gap-4">
-                  {["매우 반대", "약간 반대", "중립", "약간 찬성", "매우 찬성"].map(
-                    (txt) => (
-                      <div key={txt} className="text-center">
-                        <span className="text-xs text-gray-500">{txt}</span>
-                      </div>
-                    )
-                  )}
+                  {["매우 반대", "약간 반대", "중립", "약간 찬성", "매우 찬성"].map((txt) => (
+                    <div key={txt} className="text-center">
+                      <span className="text-xs text-gray-500">{txt}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
