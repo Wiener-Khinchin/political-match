@@ -39,7 +39,7 @@ export default function ResultPage() {
   if (loading || !bestMatch || !candidate)
     return <p className="text-center mt-10">결과를 불러오는 중...</p>;
 
-  const shareUrl = `${window.location.origin}/result?id=${bestMatch.id}`;
+  const shareUrl = `${window.location.origin}`;
   const shareText = `나와 가장 맞는 후보는 ${candidateNameMap[candidate.id]}!`;
 
   const shareNative = async () => {
