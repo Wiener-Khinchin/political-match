@@ -50,13 +50,15 @@ export default function SurveyPage() {
     ];
     setAnswer(globalIdx, value);
 
+    // 다음 문항 or 다음 페이지
     const pageFilled = newScores.slice(startIndex, endIndex).every(v => v !== 0);
     if (pageFilled && endIndex < QUESTIONS.length) {
-      setCurrentStep(endIndex);                    // 페이지 완료 → 다음 페이지
+      setCurrentStep(endIndex);
     } else if (prev === 0 && globalIdx + 1 < QUESTIONS.length) {
-      setCurrentStep(globalIdx + 1);               // 새 답변 → 다음 문항
+      setCurrentStep(globalIdx + 1);
     }
 
+    // 설문 완료 → 결과
     if (newScores.every(v => v !== 0)) {
       const { best, similarity } = findBestMatch(newScores, CANDIDATES);
       setBestMatch({ id: best.id, similarity });
@@ -101,49 +103,36 @@ export default function SurveyPage() {
                   </div>
                   <div />
                   <div className="text-center">
-                    <span className="text-sm font-medium text-gray-500">
-                      중립
-                    </span>
+                    <span className="text-sm font-medium text-gray-500">중립</span>
                   </div>
                   <div />
                   <div className="flex justify-center">
-                    <span className="text-sm font-medium text-green-500 translate-x-[6px]">
-                      찬성
-                    </span>
+                    <span className="text-sm font-medium text-green-500 translate-x-[6px]">찬성</span>
                   </div>
                 </div>
 
-                {/* 버튼 */}
+                {/* 답변 버튼 */}
                 <div className="grid grid-cols-5 gap-4 mb-2">
                   {[1, 2, 3, 4, 5].map((val) => {
                     const size =
-                      val === 3
-                        ? "w-10 h-10 text-sm"
-                        : val === 1 || val === 5
-                        ? "w-14 h-14 text-lg"
-                        : "w-12 h-12 text-base";
+                      val === 3 ? "w-10 h-10 text-sm"
+                      : val === 1 || val === 5 ? "w-14 h-14 text-lg"
+                      : "w-12 h-12 text-base";
 
                     const baseColor =
-                      val <= 2
-                        ? "border-red-500 hover:border-red-600"
-                        : val >= 4
-                        ? "border-green-500 hover:border-green-600"
-                        : "border-gray-400 hover:border-gray-500";
+                      val <= 2 ? "border-red-500 hover:border-red-600"
+                      : val >= 4 ? "border-green-500 hover:border-green-600"
+                      : "border-gray-400 hover:border-gray-500";
 
                     const selColor =
-                      val <= 2
-                        ? "bg-red-500 border-red-500"
-                        : val >= 4
-                        ? "bg-green-500 border-green-500"
-                        : "bg-gray-500 border-gray-500";
+                      val <= 2 ? "bg-red-500 border-red-500"
+                      : val >= 4 ? "bg-green-500 border-green-500"
+                      : "bg-gray-500 border-gray-500";
 
                     return (
                       <div key={val} className="flex justify-center items-center">
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAnswer(idxInPage, val);
-                          }}
+                          onClick={(e) => { e.stopPropagation(); handleAnswer(idxInPage, val); }}
                           className={`
                             ${size} rounded-full border-2 flex items-center justify-center transition
                             ${
@@ -177,16 +166,10 @@ export default function SurveyPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowCons(
-                            showCons === number - 1 ? null : number - 1
-                          );
+                          setShowCons(showCons === number - 1 ? null : number - 1);
                           setShowPros(null);
                         }}
-                        className={`px-4 py-2 rounded text-sm ${
-                          showCons === number - 1
-                            ? "bg-gray-200"
-                            : "bg-gray-100"
-                        }`}
+                        className={`px-4 py-2 rounded text-sm ${showCons === number - 1 ? "bg-gray-200" : "bg-gray-100"}`}
                       >
                         [근거] 반대
                       </button>
@@ -196,16 +179,10 @@ export default function SurveyPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowPros(
-                            showPros === number - 1 ? null : number - 1
-                          );
+                          setShowPros(showPros === number - 1 ? null : number - 1);
                           setShowCons(null);
                         }}
-                        className={`px-4 py-2 rounded text-sm ${
-                          showPros === number - 1
-                            ? "bg-gray-200"
-                            : "bg-gray-100"
-                        }`}
+                        className={`px-4 py-2 rounded text-sm ${showPros === number - 1 ? "bg-gray-200" : "bg-gray-100"}`}
                       >
                         [근거] 찬성
                       </button>
@@ -214,12 +191,8 @@ export default function SurveyPage() {
 
                   {(showCons === number - 1 || showPros === number - 1) && (
                     <div className="p-4 bg-gray-50 rounded-lg">
-                      {showCons === number - 1 && question.cons && (
-                        <p className="text-gray-700">{question.cons}</p>
-                      )}
-                      {showPros === number - 1 && question.pros && (
-                        <p className="text-gray-700">{question.pros}</p>
-                      )}
+                      {showCons === number - 1 && question.cons && <p className="text-gray-700">{question.cons}</p>}
+                      {showPros === number - 1 && question.pros && <p className="text-gray-700">{question.pros}</p>}
                     </div>
                   )}
                 </div>
