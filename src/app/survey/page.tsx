@@ -47,8 +47,9 @@ export default function SurveyPage() {
     setAnswer(globalIdx, value);
 
     // 2) 처음 답한 문항일 때만 진도++
-    if (prev === 0 && globalIdx < QUESTIONS.length - 1) {
-      setCurrentStep(currentStep + 1);
+    const pageFilled = userScores.slice(startIndex, endIndex).every(v => v !== 0);
+    if (pageFilled && endIndex < QUESTIONS.length) {
+      setCurrentStep(endIndex);
     }
 
     // 3) 모든 문항이 채워졌으면 결과 페이지로 이동
