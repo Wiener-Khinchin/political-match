@@ -11,6 +11,7 @@ import { candidateSymbolMap } from "@/data/candidateSymbolMap";
 import { candidateColorMap } from "@/data/candidateColorMap";
 import Image from "next/image";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare global {
   interface Window {
     Kakao: any;
@@ -23,6 +24,7 @@ export default function ResultPage() {
   const router = useRouter();
   const candidate = CANDIDATES.find((c) => c.id === bestMatch?.id);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!userScores || userScores.every((v) => v === 0)) {
       router.push("/survey");
@@ -37,7 +39,11 @@ export default function ResultPage() {
       });
     }
 
-    if (process.env.NEXT_PUBLIC_KAKAO_JS_KEY) {
+    if (
+      typeof window !== "undefined" &&
+      window.Kakao &&
+      process.env.NEXT_PUBLIC_KAKAO_JS_KEY
+    ) {
       window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
     }
 
@@ -50,7 +56,6 @@ export default function ResultPage() {
   const shareUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/result?id=${bestMatch.id}`;
   const shareText = `나와 가장 맞는 후보는 ${candidateNameMap[candidate.id]}!`;
 
-  /* ---------- 공유 핸들러 ---------- */
   const shareNative = async () => {
     if (navigator.share) {
       await navigator.share({ title: shareText, url: shareUrl });
@@ -70,21 +75,23 @@ export default function ResultPage() {
   };
 
   const shareToKakao = () => {
-    window.Kakao.Share.sendDefault({
-      objectType: "feed",
-      content: {
-        title: shareText,
-        description: "대선 누구 뽑지? 테스트 결과",
-        imageUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/og/${bestMatch.id}.png`,
-        link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
-      },
-      buttons: [
-        {
-          title: "결과 보러가기",
+    if (typeof window !== "undefined" && window.Kakao) {
+      window.Kakao.Share.sendDefault({
+        objectType: "feed",
+        content: {
+          title: shareText,
+          description: "대선 누구 뽑지? 테스트 결과",
+          imageUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/og/${bestMatch.id}.png`,
           link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
         },
-      ],
-    });
+        buttons: [
+          {
+            title: "결과 보러가기",
+            link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+          },
+        ],
+      });
+    }
   };
 
   return (
@@ -94,12 +101,10 @@ export default function ResultPage() {
       <div className="w-full max-w-2xl p-6">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="flex flex-col items-center space-y-6">
-            {/* Intro */}
             <h2 className="text-2xl font-semibold text-gray-800">
               나와 가장 맞는 후보는?
             </h2>
 
-            {/* 사진 */}
             <div className="relative w-48 h-48 rounded-full overflow-hidden shadow-lg">
               <Image
                 src={candidateImageMap[candidate.id]}
@@ -110,7 +115,6 @@ export default function ResultPage() {
               />
             </div>
 
-            {/* 기호 + 이름 */}
             <div className="text-center">
               <p className="text-xl text-gray-600 mb-2">
                 {candidateSymbolMap[candidate.id]}
@@ -120,13 +124,11 @@ export default function ResultPage() {
               </h1>
             </div>
 
-            {/* 공유 */}
             <div className="w-full pt-6 border-t border-gray-200">
               <h3 className="text-lg font-semibold text-center mb-4">
                 결과 공유하기
               </h3>
               <div className="flex justify-center gap-4">
-                {/* Web Share */}
                 <button
                   onClick={shareNative}
                   className="p-3 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
@@ -147,10 +149,9 @@ export default function ResultPage() {
                   </svg>
                 </button>
 
-                {/* X (Twitter) — ★ 파란 → 검은 배경으로 변경 */}
                 <button
                   onClick={shareToTwitter}
-                  className="p-3 rounded-full bg-black hover:bg-gray-800 transition-colors" /* ★ */
+                  className="p-3 rounded-full bg-black hover:bg-gray-800 transition-colors"
                   title="X (Twitter)로 공유"
                 >
                   <svg
@@ -162,17 +163,12 @@ export default function ResultPage() {
                   </svg>
                 </button>
 
-                {/* KakaoTalk */}
                 <button
                   onClick={shareToKakao}
                   className="p-3 rounded-full bg-[#FEE500] hover:bg-[#F4DC00] transition-colors"
                   title="카카오톡으로 공유"
                 >
-                  <svg
-                    className="w-6 h-6"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
                     <path
                       fillRule="evenodd"
                       clipRule="evenodd"
