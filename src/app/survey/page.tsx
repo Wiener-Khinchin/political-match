@@ -24,9 +24,9 @@ export default function SurveyPage() {
   const router = useRouter();
 
   /* ---------------- pagination ---------------- */
-  const currentPage  = currentStep >= 24 ? 4 : Math.floor(currentStep / 6);
-  const startIndex   = currentPage === 0 ? 0 : currentPage * 6;
-  const endIndex     = currentPage === 4 ? 31 : startIndex + 6;
+  const currentPage = currentStep >= 24 ? 4 : Math.floor(currentStep / 6);
+  const startIndex = currentPage === 0 ? 0 : currentPage * 6;
+  const endIndex = currentPage === 4 ? 31 : startIndex + 6;
   const currentQuestions = QUESTIONS.slice(startIndex, endIndex);
 
   /* ---------------- scroll on step change ---------------- */
@@ -39,72 +39,67 @@ export default function SurveyPage() {
   }, [currentStep, startIndex]);
 
   /* ---------------- answer handler ---------------- */
-  /* ---------------- answer handler ---------------- */
-const handleAnswer = (idxInPage: number, value: number) => {
-  const globalIdx = idxInPage + startIndex;
-  const prev      = userScores[globalIdx];
+  const handleAnswer = (idxInPage: number, value: number) => {
+    const globalIdx = idxInPage + startIndex;
+    const prev = userScores[globalIdx];
 
-  /* 1) 새 점수 배열 */
-  const newScores = [
-    ...userScores.slice(0, globalIdx),
-    value,
-    ...userScores.slice(globalIdx + 1),
-  ];
-  setAnswer(globalIdx, value);
+    // 1) 점수 갱신
+    setAnswer(globalIdx, value);
 
-  /* 2) 이번 문항을 처음 답했을 때만 커서 이동 로직 수행 */
-  if (prev === 0) {
-    const pageScores      = newScores.slice(startIndex, endIndex);     // 현재 페이지 6문항
-    const firstUnanswered = pageScores.findIndex(v => v === 0);        // 아직 안 푼 문항 인덱스
-
-    if (firstUnanswered !== -1) {
-      /* 아직 안 푼 문항이 남아 있으면 → 그 문항으로 이동 */
-      setCurrentStep(startIndex + firstUnanswered);
-    } else if (endIndex < QUESTIONS.length) {
-      /* 페이지가 전부 채워졌으면 → 다음 페이지 첫 문항으로 */
-      setCurrentStep(endIndex);
+    // 2) 처음 답한 문항일 때만 진도++
+    if (prev === 0 && globalIdx < QUESTIONS.length - 1) {
+      setCurrentStep(currentStep + 1);
     }
-    /* (마지막 페이지까지 꽉 채운 경우는 아래 결과 이동 로직에서 처리) */
-  }
 
-  /* 3) 설문 전체 완료 시 결과 페이지로 이동 */
-  if (newScores.every(v => v !== 0)) {
-    const { best, similarity } = findBestMatch(newScores, CANDIDATES);
-    setBestMatch({ id: best.id, similarity });
-    router.push("/result");
-  }
-};
+    // 3) 모든 문항이 채워졌으면 결과 페이지로 이동
+    const newScores = [
+      ...userScores.slice(0, globalIdx),
+      value,
+      ...userScores.slice(globalIdx + 1),
+    ];
+    if (newScores.every((v) => v !== 0)) {
+      const { best, similarity } = findBestMatch(newScores, CANDIDATES);
+      setBestMatch({ id: best.id, similarity });
+      router.push("/result");
+    }
+  };
 
+  /* ---------------- 이미 답한 문항 클릭 시 ---------------- */
+  const handleQuestionClick = (globalIdx: number) => {
+    if (userScores[globalIdx] !== 0) {
+      useSurveyStore.setState({ currentStep: globalIdx });
+    }
+  };
 
   /* ---------------- render ---------------- */
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="space-y-12">
         {currentQuestions.map((question, idxInPage) => {
-          const number     = idxInPage + startIndex + 1;
-          const isActive   = number - 1 === currentStep;
+          const number = idxInPage + startIndex + 1;
+          const isActive = number - 1 === currentStep;
           const isAnswered = userScores[number - 1] !== 0;
-          const hasArgs    = question.cons !== "" || question.pros !== "";
+          const hasArgs = question.cons !== "" || question.pros !== "";
 
           return (
             <div
               key={number}
-              ref={(el) => { questionRefs.current[idxInPage] = el; }}
-              className={`
-                transition-all
-                ${isActive
+              ref={(el) => {
+                questionRefs.current[idxInPage] = el; // 안전한 ref 콜백
+              }}
+              onClick={() => handleQuestionClick(number - 1)}
+              className={`transition-all cursor-pointer ${
+                isActive
                   ? "opacity-100 scale-100"
                   : isAnswered
-                  ? "opacity-60 scale-95"
-                  : "opacity-40 scale-95"}
-              `}
+                  ? "opacity-60 scale-95 hover:opacity-80"
+                  : "opacity-40 scale-95"
+              }`}
             >
               {/* 질문 텍스트 */}
-              {/* 질문 텍스트 */}
-<h2 className="text-xl font-semibold mb-4 text-center break-words leading-relaxed">
-  {number}. {question.text}
-</h2>
-
+              <h2 className="text-xl font-semibold mb-4 text-center">
+                {number}. {question.text}
+              </h2>
 
               {/* ───────── Likert 스케일 ───────── */}
               <div className="relative w-full">
@@ -115,43 +110,53 @@ const handleAnswer = (idxInPage: number, value: number) => {
                   </div>
                   <div />
                   <div className="text-center">
-                    <span className="text-sm font-medium text-gray-500">중립</span>
+                    <span className="text-sm font-medium text-gray-500">
+                      중립
+                    </span>
                   </div>
                   <div />
                   <div className="flex justify-center">
-                    <span className="text-sm font-medium text-green-500 translate-x-[6px]">찬성</span>
+                    <span className="text-sm font-medium text-green-500 translate-x-[6px]">
+                      찬성
+                    </span>
                   </div>
                 </div>
 
-                {/* 답변 버튼 */}
+                {/* 버튼 */}
                 <div className="grid grid-cols-5 gap-4 mb-2">
                   {[1, 2, 3, 4, 5].map((val) => {
                     const size =
-                      val === 3 ? "w-10 h-10 text-sm"
-                      : val === 1 || val === 5 ? "w-14 h-14 text-lg"
-                      : "w-12 h-12 text-base";
-
+                      val === 3
+                        ? "w-10 h-10 text-sm"
+                        : val === 1 || val === 5
+                        ? "w-14 h-14 text-lg"
+                        : "w-12 h-12 text-base";
                     const baseColor =
-                      val <= 2 ? "border-red-500 hover:border-red-600"
-                      : val >= 4 ? "border-green-500 hover:border-green-600"
-                      : "border-gray-400 hover:border-gray-500";
-
+                      val <= 2
+                        ? "border-red-500 hover:border-red-600"
+                        : val >= 4
+                        ? "border-green-500 hover:border-green-600"
+                        : "border-gray-400 hover:border-gray-500";
                     const selColor =
-                      val <= 2 ? "bg-red-500 border-red-500"
-                      : val >= 4 ? "bg-green-500 border-green-500"
-                      : "bg-gray-500 border-gray-500";
+                      val <= 2
+                        ? "bg-red-500 border-red-500"
+                        : val >= 4
+                        ? "bg-green-500 border-green-500"
+                        : "bg-gray-500 border-gray-500";
 
                     return (
                       <div key={val} className="flex justify-center items-center">
                         <button
-                          onClick={(e) => { e.stopPropagation(); handleAnswer(idxInPage, val); }}
-                          className={`
-                            ${size} rounded-full border-2 flex items-center justify-center transition
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAnswer(idxInPage, val);
+                          }}
+                          className={`${size} rounded-full border-2 flex items-center justify-center transition
                             ${
                               userScores[number - 1] === val
                                 ? `${selColor} text-white`
-                                : `${baseColor} hover:scale-105`}
-                          `}
+                                : `${baseColor} hover:scale-105`
+                            }`}
                         >
                           {val}
                         </button>
@@ -162,11 +167,13 @@ const handleAnswer = (idxInPage: number, value: number) => {
 
                 {/* 하단 라벨 */}
                 <div className="grid grid-cols-5 gap-4">
-                  {["매우 반대", "약간 반대", "중립", "약간 찬성", "매우 찬성"].map((txt) => (
-                    <div key={txt} className="text-center">
-                      <span className="text-xs text-gray-500">{txt}</span>
-                    </div>
-                  ))}
+                  {["매우 반대", "약간 반대", "중립", "약간 찬성", "매우 찬성"].map(
+                    (txt) => (
+                      <div key={txt} className="text-center">
+                        <span className="text-xs text-gray-500">{txt}</span>
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
 
@@ -178,10 +185,16 @@ const handleAnswer = (idxInPage: number, value: number) => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowCons(showCons === number - 1 ? null : number - 1);
+                          setShowCons(
+                            showCons === number - 1 ? null : number - 1
+                          );
                           setShowPros(null);
                         }}
-                        className={`px-4 py-2 rounded text-sm ${showCons === number - 1 ? "bg-gray-200" : "bg-gray-100"}`}
+                        className={`px-4 py-2 rounded text-sm ${
+                          showCons === number - 1
+                            ? "bg-gray-200"
+                            : "bg-gray-100"
+                        }`}
                       >
                         [근거] 반대
                       </button>
@@ -191,10 +204,16 @@ const handleAnswer = (idxInPage: number, value: number) => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowPros(showPros === number - 1 ? null : number - 1);
+                          setShowPros(
+                            showPros === number - 1 ? null : number - 1
+                          );
                           setShowCons(null);
                         }}
-                        className={`px-4 py-2 rounded text-sm ${showPros === number - 1 ? "bg-gray-200" : "bg-gray-100"}`}
+                        className={`px-4 py-2 rounded text-sm ${
+                          showPros === number - 1
+                            ? "bg-gray-200"
+                            : "bg-gray-100"
+                        }`}
                       >
                         [근거] 찬성
                       </button>
@@ -203,8 +222,12 @@ const handleAnswer = (idxInPage: number, value: number) => {
 
                   {(showCons === number - 1 || showPros === number - 1) && (
                     <div className="p-4 bg-gray-50 rounded-lg">
-                      {showCons === number - 1 && question.cons && <p className="text-gray-700">{question.cons}</p>}
-                      {showPros === number - 1 && question.pros && <p className="text-gray-700">{question.pros}</p>}
+                      {showCons === number - 1 && question.cons && (
+                        <p className="text-gray-700">{question.cons}</p>
+                      )}
+                      {showPros === number - 1 && question.pros && (
+                        <p className="text-gray-700">{question.pros}</p>
+                      )}
                     </div>
                   )}
                 </div>
