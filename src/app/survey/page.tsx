@@ -100,7 +100,11 @@ const handleAnswer = (idxInPage: number, value: number) => {
               `}
             >
               {/* 질문 텍스트 */}
-              
+              {/* 질문 텍스트 */}
+<h2 className="text-xl font-semibold mb-4 text-center break-words leading-relaxed">
+  {number}. {question.text}
+</h2>
+
 
               {/* ───────── Likert 스케일 ───────── */}
               <div className="relative w-full">
