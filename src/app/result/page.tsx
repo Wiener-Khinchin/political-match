@@ -41,7 +41,7 @@ export default function ResultPage() {
   const siteOrigin =
     process.env.NEXT_PUBLIC_SITE_URL ||
     (typeof window !== "undefined" ? window.location.origin : "");
-  const shareUrl  = `${siteOrigin}/result?id=${bestMatch.id}`;
+  const shareUrl  = siteOrigin;
   const shareText = `나와 가장 맞는 후보는 ${candidateNameMap[candidate.id]}!`;
 
   /* ---------- 공유 핸들러 ---------- */
