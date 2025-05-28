@@ -1,3 +1,4 @@
+/* src/app/survey/page.tsx */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -64,13 +65,6 @@ export default function SurveyPage() {
     }
   };
 
-  /* ---------------- 이미 답한 문항 클릭 시 ---------------- */
-  const handleQuestionClick = (globalIdx: number) => {
-    if (userScores[globalIdx] !== 0) {
-      useSurveyStore.setState({ currentStep: globalIdx });
-    }
-  };
-
   /* ---------------- render ---------------- */
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -85,14 +79,13 @@ export default function SurveyPage() {
             <div
               key={number}
               ref={(el) => {
-                questionRefs.current[idxInPage] = el; // 안전한 ref 콜백
+                questionRefs.current[idxInPage] = el;
               }}
-              onClick={() => handleQuestionClick(number - 1)}
-              className={`transition-all cursor-pointer ${
+              className={`transition-all ${
                 isActive
                   ? "opacity-100 scale-100"
                   : isAnswered
-                  ? "opacity-60 scale-95 hover:opacity-80"
+                  ? "opacity-60 scale-95"   /* 클릭·hover 효과 제거 */
                   : "opacity-40 scale-95"
               }`}
             >
