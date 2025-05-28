@@ -100,7 +100,7 @@ export default function ResultPage() {
             {/* 공유: 링크 복사 / X */}
             <div className="w-full pt-6 border-t border-gray-200">
               <h3 className="text-lg font-semibold text-center mb-4">
-                결과 공유하기
+                링크 공유하기
               </h3>
               <div className="flex justify-center gap-4">
                 {/* Web Share / 링크 복사 */}
