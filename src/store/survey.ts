@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { CandidateId } from '../data/candidates';
-import { findBestMatch } from '@/lib/similarity';
 
 export interface SurveyStore {
   // User's answers to 31 questions (1-5)
