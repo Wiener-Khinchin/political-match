@@ -5,8 +5,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://political-match.vercel.app";
-const ogImage = `${siteUrl}/go-thumbnail.jpeg`;
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://presidentnuguvote.com";
+const ogImage = `${siteUrl}/og-thumbnail.jpeg`; // ✅ 파일 이름 정확히 반영
 
 export const metadata: Metadata = {
   title: {
