@@ -31,12 +31,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <head>
-        {<script defer data-domain="presidentnuguvote.com" src="https://plausible.io/js/script.js"></script>}
+        {/* ✅ Plausible 고급 추적 스크립트 */}
         <Script
           defer
           data-domain="presidentnuguvote.com"
-          src="https://plausible.io/js/script.js"
+          src="https://plausible.io/js/script.outbound-links.tagged-events.js"
         />
+        <Script id="plausible-init">{`
+          window.plausible = window.plausible || function() {
+            (window.plausible.q = window.plausible.q || []).push(arguments)
+          }
+        `}</Script>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
