@@ -5,6 +5,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://political-match.vercel.app";
+const ogImage = `${siteUrl}/go-thumbnail.jpeg`;
+
 export const metadata: Metadata = {
   title: {
     default: "대통령 누구 뽑지?",
@@ -14,15 +17,24 @@ export const metadata: Metadata = {
   openGraph: {
     title: "대통령 누구 뽑지?",
     description: "31문항으로 나와 맞는 후보를 찾아보는 테스트",
-    url: process.env.NEXT_PUBLIC_SITE_URL,
+    url: siteUrl,
     siteName: "대통령 누구 뽑지?",
     locale: "ko_KR",
     type: "website",
+    images: [
+      {
+        url: ogImage,
+        width: 1200,
+        height: 630,
+        alt: "정치 성향 테스트 썸네일",
+      },
+    ],
   },
   twitter: {
     title: "대통령 누구 뽑지?",
     description: "31문항으로 나와 맞는 후보를 찾아보는 테스트",
     card: "summary_large_image",
+    images: [ogImage],
   },
 };
 
