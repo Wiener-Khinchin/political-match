@@ -42,7 +42,7 @@ export default function ResultPage() {
     process.env.NEXT_PUBLIC_SITE_URL ||
     (typeof window !== "undefined" ? window.location.origin : "");
   const shareUrl  = siteOrigin;
-  const shareText = `나와 가장 맞는 후보는 ${candidateNameMap[candidate.id]}!`;
+  const shareText = `대통령 누구 뽑지?`;
 
   /* ---------- 공유 핸들러 ---------- */
   const shareNative = async () => {
@@ -100,7 +100,7 @@ export default function ResultPage() {
             {/* 공유: 링크 복사 / X */}
             <div className="w-full pt-6 border-t border-gray-200">
               <h3 className="text-lg font-semibold text-center mb-4">
-                설문 링크 공유하기
+                링크 공유하기
               </h3>
               <div className="flex justify-center gap-4">
                 {/* Web Share / 링크 복사 */}
