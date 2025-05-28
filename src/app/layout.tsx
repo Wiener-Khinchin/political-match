@@ -30,21 +30,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <head>
-        {/* ✅ Plausible 추적 스크립트 직접 삽입 */}
+        {/* Plausible 고급 추적 스크립트 */}
         <script
           defer
           data-domain="presidentnuguvote.com"
           src="https://plausible.io/js/script.outbound-links.tagged-events.js"
-        ></script>
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
               window.plausible = window.plausible || function () {
-                (window.plausible.q = window.plausible.q || []).push(arguments)
-              }
+                (window.plausible.q = window.plausible.q || []).push(arguments);
+              };
             `,
           }}
-        ></script>
+        />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
