@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-/* 🔽 전역 메타데이터 수정 */
 export const metadata: Metadata = {
   title: {
     default: "대통령 누구 뽑지?",
@@ -30,6 +30,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
+      <head>
+        {<script defer data-domain="presidentnuguvote.com" src="https://plausible.io/js/script.js"></script>}
+        <Script
+          defer
+          data-domain="presidentnuguvote.com"
+          src="https://plausible.io/js/script.js"
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
