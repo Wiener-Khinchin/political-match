@@ -6,23 +6,24 @@ import { CANDIDATES } from "@/data/candidates";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { findBestMatch } from "@/lib/similarity";
-import {
-  candidateImageMap,
-  candidateNameMap,
-  candidateSymbolMap,
-  candidateColorMap,
-} from "@/data";
+
+/* ✅ 각 파일을 정확히 import */
+import { candidateImageMap }   from "@/data/candidateImageMap";
+import { candidateNameMap }    from "@/data/candidateNameMap";
+import { candidateSymbolMap }  from "@/data/candidateSymbolMap";
+import { candidateColorMap }   from "@/data/candidateColorMap";
+
 import Image from "next/image";
 
 export default function ResultPage() {
   const { userScores, bestMatch, setBestMatch } = useSurveyStore();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const candidate = CANDIDATES.find((c) => c.id === bestMatch?.id);
+  const candidate = CANDIDATES.find(c => c.id === bestMatch?.id);
 
   /* ── 최초 로직 ── */
   useEffect(() => {
-    if (!userScores || userScores.every((v) => v === 0)) {
+    if (!userScores || userScores.every(v => v === 0)) {
       router.push("/survey");
       return;
     }
@@ -40,7 +41,7 @@ export default function ResultPage() {
   const siteOrigin =
     process.env.NEXT_PUBLIC_SITE_URL ||
     (typeof window !== "undefined" ? window.location.origin : "");
-  const shareUrl = `${siteOrigin}/result?id=${bestMatch.id}`;
+  const shareUrl  = `${siteOrigin}/result?id=${bestMatch.id}`;
   const shareText = `나와 가장 맞는 후보는 ${candidateNameMap[candidate.id]}!`;
 
   /* ---------- 공유 핸들러 ---------- */
@@ -70,10 +71,12 @@ export default function ResultPage() {
       <div className="w-full max-w-2xl p-6">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="flex flex-col items-center space-y-6">
+            {/* 제목 */}
             <h2 className="text-2xl font-semibold text-gray-800">
               나와 가장 맞는 후보는?
             </h2>
 
+            {/* 사진 */}
             <div className="relative w-48 h-48 rounded-full overflow-hidden shadow-lg">
               <Image
                 src={candidateImageMap[candidate.id]}
@@ -84,6 +87,7 @@ export default function ResultPage() {
               />
             </div>
 
+            {/* 기호 + 이름 */}
             <div className="text-center">
               <p className="text-xl text-gray-600 mb-2">
                 {candidateSymbolMap[candidate.id]}
@@ -105,6 +109,7 @@ export default function ResultPage() {
                   className="p-3 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
                   title="링크 공유하기"
                 >
+                  {/* 화살표 아이콘 */}
                   <svg
                     className="w-6 h-6"
                     fill="none"
@@ -120,12 +125,13 @@ export default function ResultPage() {
                   </svg>
                 </button>
 
-                {/* X (Twitter) */}
+                {/* X(Twitter) */}
                 <button
                   onClick={shareToTwitter}
                   className="p-3 rounded-full bg-black hover:bg-gray-800 transition-colors"
                   title="X(Twitter)로 공유"
                 >
+                  {/* X 아이콘 */}
                   <svg
                     className="w-6 h-6 text-white"
                     fill="currentColor"
