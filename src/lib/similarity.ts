@@ -7,9 +7,9 @@ const WEIGHTS = [
   // Q25: weight = 0.5
   0.5,
   // Q26-Q27: weight = 2
-  ...Array(2).fill(1.7),
+  ...Array(2).fill(2),
   // Q28-Q31: weight = 1.5
-  ...Array(4).fill(1.3)
+  ...Array(4).fill(1.5)
 ] as const;
 
 /**
