@@ -13,10 +13,10 @@ export const metadata: Metadata = {
     default: "대통령 누구 뽑지?",
     template: "%s | 대통령 누구 뽑지?",
   },
-  description: "31문항으로 나와 맞는 후보를 찾아보는 테스트",
+  description: "31문항으로 나와 맞는 후보를 찾아보는 테스트. 정치색 없이 중립적으로 설계되었습니다.",
   openGraph: {
     title: "대통령 누구 뽑지?",
-    description: "31문항으로 나와 맞는 후보를 찾아보는 테스트",
+    description: "31문항으로 나와 맞는 후보를 찾아보는 테스트. 정치색 없이 중립적으로 설계되었습니다.",
     url: siteUrl,
     siteName: "대통령 누구 뽑지?",
     locale: "ko_KR",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     title: "대통령 누구 뽑지?",
-    description: "31문항으로 나와 맞는 후보를 찾아보는 테스트",
+    description: "31문항으로 나와 맞는 후보를 찾아보는 테스트. 정치색 없이 중립적으로 설계되었습니다.",
     card: "summary_large_image",
     images: [ogImage],
   },
@@ -42,21 +42,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <head>
-        {/* 🔥 직접 메타태그 삽입: 모든 플랫폼 대응 */}
+        <title>대통령 누구 뽑지? - 나와 가장 닮은 후보는?</title>
+        <meta name="description" content="31문항으로 나와 맞는 후보를 찾아보는 테스트. 정치색 없이 중립적으로 설계되었습니다." />
+        <meta name="keywords" content="대선 후보 매칭, 정치 성향 테스트, 대통령 선거, 대선 테스트, 설문, 대통령 누구 뽑지" />
+        
+        {/* Open Graph */}
         <meta property="og:title" content="대통령 누구 뽑지?" />
-        <meta property="og:description" content="31문항으로 나와 맞는 후보를 찾아보는 테스트" />
+        <meta property="og:description" content="31문항으로 나와 맞는 후보를 찾아보는 테스트. 정치색 없이 중립적으로 설계되었습니다." />
         <meta property="og:image" content={ogImage} />
         <meta property="og:url" content={siteUrl} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="대통령 누구 뽑지?" />
         <meta property="og:locale" content="ko_KR" />
 
+        {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="대통령 누구 뽑지?" />
-        <meta name="twitter:description" content="31문항으로 나와 맞는 후보를 찾아보는 테스트" />
+        <meta name="twitter:description" content="31문항으로 나와 맞는 후보를 찾아보는 테스트. 정치색 없이 중립적으로 설계되었습니다." />
         <meta name="twitter:image" content={ogImage} />
 
-        {/* Plausible 고급 추적 스크립트 */}
+        {/* Plausible 고급 추적 */}
         <script
           defer
           data-domain="presidentnuguvote.com"
